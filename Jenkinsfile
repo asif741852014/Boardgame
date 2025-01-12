@@ -9,6 +9,11 @@ pipeline {
                 sh "mvn compile"
             }
         }
+        stage('compile') {
+            steps {
+                sh "cat asif.txt"
+            }
+        }
         stage('test') {
             steps {
                 sh "mvn test"
