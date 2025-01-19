@@ -17,13 +17,13 @@ jobs:
         java-version: '17' 
         distribution: 'temurin' 
         cache: maven 
+    - name: Install unzip and jq 
+      run: sudo apt-get update && sudo apt-get install -y unzip jq
     - name: SonarQube Scan 
       uses: sonarsource/sonarqube-scan-action@master 
       env: 
         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }} 
         SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
-    - name: Install jq 
-      run: sudo apt-get update && sudo apt-get install -y jq 
   maven_compile:
     runs-on: self-hosted
     needs: setup_tools
