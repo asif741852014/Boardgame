@@ -75,3 +75,14 @@ jobs:
     -  name: Push Docker Image 
        run: | 
            docker push asif1998/image1:v1
+  kubernetes_deploy:
+    runs-on: self-hosted 
+    needs: docker_login_push
+    steps:
+    - name: Kubectl Action 
+      uses: tale/kubectl-action@v1 
+      with: 
+        base64-kube-config: ${{ secrets.KUBE_CONFIG }} 
+    - run: | 
+         kubectl apply -f deployment-service.yaml 
+         kubectl get svc 
