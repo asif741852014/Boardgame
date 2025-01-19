@@ -16,3 +16,12 @@ jobs:
       run: mvn compile
     - run: mvn test
     - run: mvn package
+  sonarqube_publish_report:
+    runs-on: self-hosted 
+    needs: maven_compile_test_package
+    steps:
+     - name: SonarQube Scan 
+       uses: sonarsource/sonarqube-scan-action@master 
+       env: 
+        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }} 
+        SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }} 
