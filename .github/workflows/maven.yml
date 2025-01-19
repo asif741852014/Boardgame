@@ -25,3 +25,9 @@ jobs:
        env: 
         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }} 
         SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }} 
+  trivy_fs_scan:
+    runs-on: self-hosted 
+    needs: sonarqube_publish_report
+    steps:
+    - run: trivy fs --format table -o fs.html .
+    
