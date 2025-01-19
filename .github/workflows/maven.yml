@@ -8,7 +8,7 @@ on:
 
 jobs:
   setup_tools:
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     steps:
     - uses: actions/checkout@v3
     - name: Set up JDK 17 
@@ -24,9 +24,27 @@ jobs:
         SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
     - name: Install jq 
       run: sudo apt-get update && sudo apt-get install -y jq 
-  
+  maven_compile:
+    runs-on: self-hosted
+    steps:
+    - run: mvn compile
+  maven_test:
+    runs-on: self-hosted
+    steps:
+    - run: mvn test
+  sonar_quality_check:
+    runs-on: self-hosted
+    steps:
+    - name: SonarQube Quality Gate check 
+      id: sonarqube-quality-gate-check 
+      uses: sonarsource/sonarqube-quality-gate-action@master 
+      timeout-minutes: 5 
+      env: 
+        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }} 
+        SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }} 
     
-
+    
+  
 
 
 
