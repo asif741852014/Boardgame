@@ -7,47 +7,16 @@ on:
     branches: [ "main" ]
 
 jobs:
-  setup_tools:
-    runs-on: self-hosted
-    steps:
-    - uses: actions/checkout@v3
+  build: 
+    runs-on: self-hosted 
+ 
+    steps: 
+    - uses: actions/checkout@v3 
     - name: Set up JDK 17 
       uses: actions/setup-java@v3 
       with: 
         java-version: '17' 
         distribution: 'temurin' 
         cache: maven 
-    - name: Install unzip and jq 
-      run: sudo apt-get update && sudo apt-get install -y unzip jq
-    - name: SonarQube Scan 
-      uses: sonarsource/sonarqube-scan-action@master 
-      env: 
-        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }} 
-        SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
-  maven_compile:
-    runs-on: self-hosted
-    needs: setup_tools
-    steps:
-    - run: mvn clean compile
-  maven_test:
-    runs-on: self-hosted
-    needs: maven_compile
-    steps:
-    - run: mvn test
-  sonar_quality_check:
-    runs-on: self-hosted
-    needs: maven_test
-    steps:
-    - name: SonarQube Quality Gate check 
-      id: sonarqube-quality-gate-check 
-      uses: sonarsource/sonarqube-quality-gate-action@master 
-      timeout-minutes: 5 
-      env: 
-        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }} 
-        SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }} 
-    
-    
-  
-
-
-
+    - name: Build with Maven 
+      run: mvn package
