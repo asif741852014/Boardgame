@@ -26,14 +26,17 @@ jobs:
       run: sudo apt-get update && sudo apt-get install -y jq 
   maven_compile:
     runs-on: self-hosted
+    needs: setup_tools
     steps:
     - run: mvn compile
   maven_test:
     runs-on: self-hosted
+    needs: maven_compile
     steps:
     - run: mvn test
   sonar_quality_check:
     runs-on: self-hosted
+    needs: maven_test
     steps:
     - name: SonarQube Quality Gate check 
       id: sonarqube-quality-gate-check 
