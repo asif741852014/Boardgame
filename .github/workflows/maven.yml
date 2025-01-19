@@ -44,4 +44,11 @@ jobs:
       with:
         name: artifactjar
         path: target/*.jar
+  docker_image_build_login_push:
+    runs-on: self-hosted 
+    needs: packaging
+    steps:
+    - run: |
+          ls -larth
+          docker build -t asif1998/image1 .
     
