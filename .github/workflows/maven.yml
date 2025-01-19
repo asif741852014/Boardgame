@@ -50,5 +50,16 @@ jobs:
     steps:
     - run: |
           ls -larth
-          docker build -t asif1998/image1 .
-    
+          docker build -t asif1998/image1:v1 .
+  trivy_image_scan:
+    runs-on: self-hosted 
+    needs: docker_image_build_login_push
+    steps:
+    - name: Trivy Image Scan 
+      run: | 
+           trivy image --format table -o trivy-image-report.html asif1998/image1:v1
+    - name: Upload trivy image report as artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: trivy-image
+        path: trivy-image-report.html
