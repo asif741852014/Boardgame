@@ -30,4 +30,9 @@ jobs:
     needs: sonarqube_publish_report
     steps:
     - run: trivy fs --format table -o fs.html .
+    - name: Upload fs.html as artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: fs-report
+        path: fs.html
     
