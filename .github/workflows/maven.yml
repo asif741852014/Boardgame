@@ -30,6 +30,36 @@ jobs:
        run: |
           cat .scannerwork/report-task.txt
           grep ceTaskId .scannerwork/report-task.txt  
+     - name: Wait for Sonar Analysis to Complete
+       run: |
+        echo "Reading Task ID..."
+        TASK_ID=$(grep ceTaskId .scannerwork/report-task.txt | cut -d= -f2)
+        echo "Task ID: $TASK_ID"
+
+        echo "Waiting for SonarQube analysis to finish..."
+
+        while true; do
+          RESPONSE=$(curl -s -u $SONAR_TOKEN: \
+          "$SONAR_HOST_URL/api/ce/task?id=$TASK_ID")
+
+          STATUS=$(echo $RESPONSE | jq -r '.task.status')
+
+          echo "Current status: $STATUS"
+
+          if [ "$STATUS" = "SUCCESS" ]; then
+            echo "Sonar analysis completed ✔"
+            ANALYSIS_ID=$(echo $RESPONSE | jq -r '.task.analysisId')
+            echo "ANALYSIS_ID=$ANALYSIS_ID" >> $GITHUB_ENV
+            break
+          fi
+
+          if [ "$STATUS" = "FAILED" ]; then
+            echo "Sonar analysis failed ❌"
+            exit 1
+          fi
+
+          sleep 5
+        done 
      # - name: SonarQube Scan
      #   run: |
      #      sonar-scanner \
