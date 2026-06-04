@@ -31,11 +31,14 @@ jobs:
           cat .scannerwork/report-task.txt
           grep ceTaskId .scannerwork/report-task.txt  
      - name: Wait for Sonar Analysis to Complete
+       env:
+        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
        run: |
         echo "Reading Task ID..."
         TASK_ID=$(grep ceTaskId .scannerwork/report-task.txt | cut -d= -f2)
         echo "Task ID: $TASK_ID"
-
+        echo $SONAR_HOST_URL
         echo "Waiting for SonarQube analysis to finish..."
         sleep 10
         echo "abcd"
