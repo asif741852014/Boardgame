@@ -37,11 +37,13 @@ jobs:
         echo "Task ID: $TASK_ID"
 
         echo "Waiting for SonarQube analysis to finish..."
-
+        sleep 10
         while true; do
           RESPONSE=$(curl -s -u $SONAR_TOKEN: \
           "$SONAR_HOST_URL/api/ce/task?id=$TASK_ID")
 
+
+          echo "Raw response: $RESPONSE"
           STATUS=$(echo $RESPONSE | jq -r '.task.status')
 
           echo "Current status: $STATUS"
