@@ -66,6 +66,29 @@ jobs:
 
           sleep 5
         done 
+     - name: Check Quality Gate (via Analysis ID)
+       env:
+         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+         SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
+       run: |
+          echo "Checking Quality Gate using Analysis ID..."
+
+          RESPONSE=$(curl -s -u $SONAR_TOKEN: \
+          "$SONAR_HOST_URL/api/qualitygates/project_status?analysisId=$ANALYSIS_ID")
+
+          echo "Response: $RESPONSE"
+
+          STATUS=$(echo "$RESPONSE" | jq -r '.projectStatus.status')
+
+          echo "QUALITY GATE STATUS: $STATUS"
+
+           if [ "$STATUS" = "OK" ]; then
+             echo "QUALITY GATE PASSED ✔"
+             exit 0
+           else
+             echo "QUALITY GATE FAILED ❌"
+             exit 1
+           fi
      # - name: SonarQube Scan
      #   run: |
      #      sonar-scanner \
