@@ -25,6 +25,11 @@ jobs:
        env:
         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
+  
+     - name: Show Sonar Task ID
+       run: |
+          cat .scannerwork/report-task.txt
+          grep ceTaskId .scannerwork/report-task.txt  
      # - name: SonarQube Scan
      #   run: |
      #      sonar-scanner \
