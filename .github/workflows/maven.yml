@@ -8,16 +8,14 @@ on:
 
 jobs:
   maven_compile_test_package: 
-    runs-on: self-hosted 
+    runs-on: self
     steps: 
     - uses: actions/checkout@v3
     - run: mvn -version
-    - name: Build with Maven 
-      run: mvn compile
     - run: mvn test
     - run: mvn package
   sonarqube_publish_report:
-    runs-on: self-hosted 
+    runs-on: self
     needs: maven_compile_test_package
     steps:
      - name: SonarQube Scan 
@@ -25,64 +23,64 @@ jobs:
        env: 
         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }} 
         SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }} 
-  trivy_fs_scan:
-    runs-on: self-hosted 
-    needs: sonarqube_publish_report
-    steps:
-    - run: trivy fs --format table -o fs.html .
-    - name: Upload fs.html as artifact
-      uses: actions/upload-artifact@v4
-      with:
-        name: fs-report
-        path: fs.html
-  packaging:
-    runs-on: self-hosted 
-    needs: trivy_fs_scan
-    steps:
-    - run: mvn clean package
-    - uses: actions/upload-artifact@v4
-      with:
-        name: artifactjar
-        path: target/*.jar
-  docker_image_build_login_push:
-    runs-on: self-hosted 
-    needs: packaging
-    steps:
-    - run: |
-          ls -larth
-          docker build -t asif1998/image1:v1 .
-  trivy_image_scan:
-    runs-on: self-hosted 
-    needs: docker_image_build_login_push
-    steps:
-    - name: Trivy Image Scan 
-      run: | 
-           trivy image --format table -o trivy-image-report.html asif1998/image1:v1
-    - name: Upload trivy image report as artifact
-      uses: actions/upload-artifact@v4
-      with:
-        name: trivy-image
-        path: trivy-image-report.html
-  docker_login_push:
-    runs-on: self-hosted 
-    needs: trivy_image_scan
-    steps:
-    - name: Login to Docker Hub 
-      uses: docker/login-action@v3 
-      with: 
-        username: ${{ secrets.DOCKERHUB_USERNAME }} 
-        password: ${{ secrets.DOCKERHUB_TOKEN }} 
-    -  name: Push Docker Image 
-       run: | 
-           docker push asif1998/image1:v1
-  kubernetes_deploy:
-    runs-on: self-hosted 
-    needs: docker_login_push
-    steps:
-    - name: Kubectl Action 
-      uses: tale/kubectl-action@v1 
-      with: 
-        base64-kube-config: ${{ secrets.KUBE_CONFIG }} 
-    - run: | 
-         kubectl apply -f deployment-service.yaml 
-         kubectl get svc 
+  # trivy_fs_scan:
+  #   runs-on: self-hosted 
+  #   needs: sonarqube_publish_report
+  #   steps:
+  #   - run: trivy fs --format table -o fs.html .
+  #   - name: Upload fs.html as artifact
+  #     uses: actions/upload-artifact@v4
+  #     with:
+  #       name: fs-report
+  #       path: fs.html
+  # packaging:
+  #   runs-on: self-hosted 
+  #   needs: trivy_fs_scan
+  #   steps:
+  #   - run: mvn clean package
+  #   - uses: actions/upload-artifact@v4
+  #     with:
+  #       name: artifactjar
+  #       path: target/*.jar
+  # docker_image_build_login_push:
+  #   runs-on: self-hosted 
+  #   needs: packaging
+  #   steps:
+  #   - run: |
+  #         ls -larth
+  #         docker build -t asif1998/image1:v1 .
+  # trivy_image_scan:
+  #   runs-on: self-hosted 
+  #   needs: docker_image_build_login_push
+  #   steps:
+  #   - name: Trivy Image Scan 
+  #     run: | 
+  #          trivy image --format table -o trivy-image-report.html asif1998/image1:v1
+  #   - name: Upload trivy image report as artifact
+  #     uses: actions/upload-artifact@v4
+  #     with:
+  #       name: trivy-image
+  #       path: trivy-image-report.html
+  # docker_login_push:
+  #   runs-on: self-hosted 
+  #   needs: trivy_image_scan
+  #   steps:
+  #   - name: Login to Docker Hub 
+  #     uses: docker/login-action@v3 
+  #     with: 
+  #       username: ${{ secrets.DOCKERHUB_USERNAME }} 
+  #       password: ${{ secrets.DOCKERHUB_TOKEN }} 
+  #   -  name: Push Docker Image 
+  #      run: | 
+  #          docker push asif1998/image1:v1
+  # kubernetes_deploy:
+  #   runs-on: self-hosted 
+  #   needs: docker_login_push
+  #   steps:
+  #   - name: Kubectl Action 
+  #     uses: tale/kubectl-action@v1 
+  #     with: 
+  #       base64-kube-config: ${{ secrets.KUBE_CONFIG }} 
+  #   - run: | 
+  #        kubectl apply -f deployment-service.yaml 
+  #        kubectl get svc 
