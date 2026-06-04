@@ -20,19 +20,24 @@ jobs:
     steps:
      - uses: actions/checkout@v3
      - name: SonarQube Scan
-       run: |
-          sonar-scanner \
-            -Dsonar.projectKey=springboot-app \
-            -Dsonar.projectName=springboot-app \
-            -Dsonar.projectVersion=1.0 \
-            -Dsonar.sources=src/main/java \
-            -Dsonar.tests=src/test/java \
-            -Dsonar.java.binaries=target/classes \
-            -Dsonar.host.url=${{ secrets.SONAR_HOST_URL }} \
-            -Dsonar.token=${{ secrets.SONAR_TOKEN }}
-       env: 
-        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }} 
-        SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }} 
+       uses: sonarsource/sonarqube-scan-action@master
+       env:
+        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
+     # - name: SonarQube Scan
+     #   run: |
+     #      sonar-scanner \
+     #        -Dsonar.projectKey=springboot-app \
+     #        -Dsonar.projectName=springboot-app \
+     #        -Dsonar.projectVersion=1.0 \
+     #        -Dsonar.sources=src/main/java \
+     #        -Dsonar.tests=src/test/java \
+     #        -Dsonar.java.binaries=target/classes \
+     #        -Dsonar.host.url=${{ secrets.SONAR_HOST_URL }} \
+     #        -Dsonar.token=${{ secrets.SONAR_TOKEN }}
+     #   env: 
+     #    SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }} 
+     #    SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }} 
   # trivy_fs_scan:
   #   runs-on: self-hosted 
   #   needs: sonarqube_publish_report
